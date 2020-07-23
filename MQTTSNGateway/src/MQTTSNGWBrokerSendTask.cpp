@@ -121,6 +121,11 @@ void BrokerSendTask::run()
 				{
 					client->connectSended();
 				}
+				else if ( packet->getType() == DISCONNECT )
+				{
+					client->getNetwork()->close();
+					client->disconnected();
+				}
 				log(client, packet);
 			}
 			else

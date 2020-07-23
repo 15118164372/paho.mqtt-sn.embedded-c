@@ -388,8 +388,7 @@ int LoRaLink::send(LoRaLinkPayloadType_t type, const uint8_t* payload, uint16_t 
     D_NWSTACK("\r\n");
 
     /* wait ACK */
-    _sem.timedwait(40000);
-//    _sem.timedwait(10000);
+    _sem.timedwait(10000);
 
     if ( _respCd != LORALINK_ACK )
     {
