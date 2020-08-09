@@ -90,6 +90,8 @@ PacketHandleTask::~PacketHandleTask()
 	{
 		delete _mqttsnAggrConnection;
 	}
+
+	WRITELOG("PacketHandleTask is deleted normally.\r\n");
 }
 
 void PacketHandleTask::run()

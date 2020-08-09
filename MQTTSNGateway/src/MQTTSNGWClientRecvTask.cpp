@@ -36,7 +36,7 @@ ClientRecvTask::ClientRecvTask(Gateway* gateway)
 
 ClientRecvTask::~ClientRecvTask()
 {
-
+	WRITELOG("ClientRecvTask is deleted normally.\r\n");
 }
 
 /**

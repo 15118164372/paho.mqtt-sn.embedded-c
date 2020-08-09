@@ -74,6 +74,7 @@ typedef struct
 {
 	bool Available;
 	bool Error;
+	bool Escape;
 	uint16_t apipos;
 	uint8_t checksum;
 } LoRaLinkReadParameters_t;

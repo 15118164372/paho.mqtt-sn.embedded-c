@@ -21,11 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 using namespace std;
 using namespace MQTTSNGW;
 int readInt(char** pptr);
-void writeInt(unsigned char** pptr, int msgId);
 
 MQTTSNPacket::MQTTSNPacket(void)
 {
@@ -162,16 +162,6 @@ int MQTTSNPacket::setGWINFO(uint8_t gatewayId)
 	return desirialize(buf, len);
 }
 
-int MQTTSNPacket::setConnect(void)
-{
-	unsigned char buf[40];
-	int buflen = sizeof(buf);
-	MQTTSNPacket_connectData data;
-	data.clientID.cstring = (char*)"client01";
-	int len = MQTTSNSerialize_connect(buf, buflen, &data);
-	return desirialize(buf, len);
-}
-
 bool MQTTSNPacket::isAccepted(void)
 {
     return  ( getType() == MQTTSN_CONNACK)  && (_buf[2] == MQTTSN_RC_ACCEPTED);
@@ -179,10 +169,27 @@ bool MQTTSNPacket::isAccepted(void)
 
 int MQTTSNPacket::setCONNACK(uint8_t returnCode)
 {
-	unsigned char buf[3];
-	int buflen = sizeof(buf);
-	int len = MQTTSNSerialize_connack(buf, buflen, (int) returnCode);
+#ifdef ADDUTC_TO_CONNACK
+	unsigned char buf[7];
+	int len = 7;
+	struct timeval now = { 1, 0 };
+	gettimeofday( &now, 0 );
+
+	buf[0] = len;
+	buf[1] = MQTTSN_CONNACK;
+	buf[2] = returnCode;
+	buf[3] = (now.tv_sec >> 24) & 0xff;
+	buf[4] = (now.tv_sec >> 16) & 0xff;
+	buf[5] = (now.tv_sec >>  8) & 0xff;
+	buf[6] = now.tv_sec & 0xff;
 	return desirialize(buf, len);
+#else
+	unsigned char buf[3];
+	int len = 0;
+	int buflen = sizeof(buf);
+	len = MQTTSNSerialize_connack(buf, buflen, (int) returnCode);
+	return desirialize(buf, len);
+#endif
 }
 
 int MQTTSNPacket::setWILLTOPICREQ(void)

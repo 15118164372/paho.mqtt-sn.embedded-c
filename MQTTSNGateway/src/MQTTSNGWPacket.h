@@ -39,7 +39,6 @@ public:
 	int getPacketLength(void);
 	const char* getName();
 
-													int setConnect(void);   // Debug
 	int setADVERTISE(uint8_t gatewayid, uint16_t duration);
 	int setGWINFO(uint8_t gatewayId);
 	int setCONNACK(uint8_t returnCode);

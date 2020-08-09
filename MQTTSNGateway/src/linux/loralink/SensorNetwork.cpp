@@ -283,6 +283,25 @@ bool LoRaLink::readApiFrame(LoRaLinkFrame_t* api, LoRaLinkReadParameters_t* para
 			continue;
 		}
 
+		if ( para->apipos > 0 && byte == ESCAPE )
+		{
+			if( recv(&byte ) == 0 )
+			{
+				byte ^= PAD;  // decode
+			}
+			else
+			{
+				para->Escape = true;
+				continue;
+			}
+		}
+
+		if( para->Escape == true )
+		{
+			byte ^= PAD;
+			para->Escape = false;
+		}
+
 		switch ( para->apipos )
 		{
 		case 0:
@@ -364,15 +383,15 @@ int LoRaLink::send(LoRaLinkPayloadType_t type, const uint8_t* payload, uint16_t 
 
     buf[0] = (len >> 8) & 0xff;
     buf[1] = len & 0xff;
-    _serialPortTx->send(buf[0]);
-    _serialPortTx->send(buf[1]);
+    send(buf[0]);
+    send(buf[1]);
 
-    _serialPortTx->send( addr->_devAddr );
+    send( addr->_devAddr );
     chks = addr->_devAddr;
 
 
 
-    _serialPortTx->send(type);
+    send(type);
     chks += type;
 
     D_NWSTACK("\r\n     Payload: ");
@@ -442,6 +461,7 @@ int LoRaLink::recv(uint8_t* buf)
 
 		if ( read(fd, buf, 1) == 1 )
 		{
+			/*
 			if ( *buf == ESCAPE )
 			{
 				D_NWSTACK( " %02x",buf[0] );
@@ -455,6 +475,7 @@ int LoRaLink::recv(uint8_t* buf)
 				}
 
 			}
+			*/
 			D_NWSTACK( " %02x",buf[0] );
 			return 0;
 		}

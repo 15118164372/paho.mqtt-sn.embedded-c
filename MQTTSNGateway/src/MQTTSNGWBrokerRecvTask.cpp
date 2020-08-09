@@ -36,7 +36,7 @@ BrokerRecvTask::BrokerRecvTask(Gateway* gateway)
 
 BrokerRecvTask::~BrokerRecvTask()
 {
-
+	WRITELOG("BrokerRecvTask is deleted normally.\r\n");
 }
 
 /**

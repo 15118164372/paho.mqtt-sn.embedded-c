@@ -23,7 +23,6 @@
 #include "Timer.h"
 #include "MQTTSNGWDefines.h"
 
-using namespace std;
 using namespace MQTTSNGW;
 
 /*=====================================

@@ -113,6 +113,7 @@ Gateway::~Gateway()
 	{
 		delete _topics;
 	}
+    WRITELOG("Gateway        is deleted normally.\r\n");
 }
 
 int Gateway::getParam(const char* parameter, char* value)
