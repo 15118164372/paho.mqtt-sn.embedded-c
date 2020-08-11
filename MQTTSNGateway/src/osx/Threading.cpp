@@ -30,6 +30,29 @@
 using namespace std;
 using namespace MQTTSNGW;
 
+int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
+{
+	while (true)
+	{
+		// try to lock the semaphore
+		int result = sem_trywait(sem);
+		if (result != -1 || errno != EAGAIN)
+			return result;
+
+		// spin lock
+		sched_yield();
+
+		// check if timeout reached
+		struct timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts);
+		if (ts.tv_sec > abs_timeout->tv_sec
+			|| (ts.tv_sec == abs_timeout->tv_sec && abs_timeout->tv_nsec >= ts.tv_nsec))
+		{
+			return ETIMEDOUT;
+		}
+	}
+}
+
 /*=====================================
  Class Mutex
  =====================================*/
@@ -141,32 +164,27 @@ void Mutex::unlock(void)
 
 Semaphore::Semaphore(unsigned int val)
 {
-	sem_init(&_sem, 0, val);
+	_sem = dispatch_semaphore_create(val);
 }
 
 Semaphore::~Semaphore()
 {
-	sem_destroy(&_sem);
+	dispatch_release(_sem);
 }
 
 void Semaphore::post(void)
 {
-	sem_post(&_sem);
+	dispatch_semaphore_signal(_sem);
 }
 
 void Semaphore::wait(void)
 {
-	sem_wait(&_sem);
+	dispatch_semaphore_wait(_sem, DISPATCH_TIME_FOREVER);
 }
 
 void Semaphore::timedwait(uint16_t millsec)
 {
-	struct timespec ts;
-	clock_gettime(CLOCK_REALTIME, &ts);
-	int nsec = ts.tv_nsec + (millsec % 1000) * 1000000;
-	ts.tv_nsec = nsec % 1000000000;
-	ts.tv_sec += millsec / 1000 + nsec / 1000000000;
-	sem_timedwait(&_sem, &ts);
+	dispatch_semaphore_wait(_sem, dispatch_time(DISPATCH_TIME_NOW, int64_t(millsec) * 1000000));
 }
 
 /*=====================================

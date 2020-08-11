@@ -19,6 +19,7 @@
 
 #include <pthread.h>
 #include <semaphore.h>
+#include <dispatch/dispatch.h>
 #include "MQTTSNGWDefines.h"
 
 namespace MQTTSNGW
@@ -59,7 +60,7 @@ public:
 	void timedwait(uint16_t millsec);
 
 private:
-	sem_t _sem;
+	dispatch_semaphore_t _sem;
 };
 
 /*=====================================

@@ -145,7 +145,7 @@ bool TCPStack::accept(TCPStack& new_socket)
 
 int TCPStack::send(const uint8_t* buf, int length)
 {
-	return ::send(_sockfd, buf, length, MSG_NOSIGNAL);
+	return ::send(_sockfd, buf, length, SO_NOSIGPIPE);	
 }
 
 int TCPStack::recv(uint8_t* buf, int len)
