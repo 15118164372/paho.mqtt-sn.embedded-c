@@ -330,8 +330,7 @@ int UDPPort6::open(const char* ipAddress, uint16_t uniPortNo, const char* broadc
 	//if given, set a given device name to bind to
 	if(strlen(interfaceName) > 0)
 	{
-		int idx = if_nametoindex(interfaceName);
-		setsockopt(_sockfdUnicast, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx));
+		setsockopt(_sockfdUnicast, SOL_SOCKET, SO_BINDTODEVICE, interfaceName, strlen(interfaceName));
 	}
 
 	//socket option: reuse address
